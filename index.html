@@ -658,9 +658,9 @@
                     <div class="card champion-card">
                         <div class="card-body text-center py-5">
                             <h3><i class="bi bi-person-fill gold me-2"></i> OLAHRAGAWATI 2025</h3>
-                            <h2 class="display-5 my-3 fw-bold">SITI NORHIDAYAH BINTI ABDULLAH</h2>
+                            <h2 class="display-5 my-3 fw-bold">SITTY NUR ASYIRAH BINTI ROSLI</h2>
                             <div class="mb-4">
-                                <span class="team-badge rentap-badge fs-5">RENTAP</span>
+                                <span class="team-badge aki-badge fs-5">AKI ANTANOM</span>
                             </div>
                             <div class="d-flex justify-content-center my-4">
                                 <div class="mx-4">
@@ -673,7 +673,7 @@
                                 </div>
                             </div>
                             <p class="fs-5">Jumlah Mata: <span class="fw-bold highlight-number">10</span></p>
-                            <p class="text-muted">Acara: 200m Perempuan 12TKB, 80m Berpagar Perempuan 12TKB</p>
+                            <p class="text-muted">Acara: 100m Perempuan 12TKB, Lompat Tinggi Perempuan 12TKB</p>
                         </div>
                     </div>
                 </div>
@@ -1111,18 +1111,23 @@
             "hang-tuah": { gold: 2, silver: 4, bronze: 3, total: 9 }
         };
 
-        // Top scorers data - UPDATED
+        // Top scorers data - Dikemaskini dengan SITTY NUR ASYIRAH BINTI ROSLI (2 emas)
         const topScorers = [
             { name: "MUHAMMAD SHAFIQ FARHAN BIN DALSAH", gender: "male", team: "rentap", gold: 2, silver: 0, bronze: 0, points: 10 },
+            { name: "SITTY NUR ASYIRAH BINTI ROSLI", gender: "female", team: "aki", gold: 2, silver: 0, bronze: 0, points: 10 },
             { name: "SITI NORHIDAYAH BINTI ABDULLAH", gender: "female", team: "rentap", gold: 2, silver: 0, bronze: 0, points: 10 },
-            { name: "SITTY NUR ASYIRAH BINTI ROSLI", gender: "female", team: "aki", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "REZELAYNE JUDIP", gender: "female", team: "rentap", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "NURSAZWANI BINTI LISMAN", gender: "female", team: "aki", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "MOHAMMAD HARFEY BIN HARDY", gender: "male", team: "mat-salleh", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "MOHAMMAD AMIRUL KHAIRUDIN BIN MOHD AZMI", gender: "male", team: "hang-tuah", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "MOHAMAD AZMIR BIN INDAN", gender: "male", team: "hang-tuah", gold: 1, silver: 0, bronze: 0, points: 5 },
             { name: "MOHD ROYY SHAFIEY", gender: "male", team: "rentap", gold: 1, silver: 0, bronze: 0, points: 5 },
-            { name: "DANISH BIN JEFRI", gender: "male", team: "rentap", gold: 1, silver: 0, bronze: 0, points: 5 }
+            { name: "DANISH BIN JEFRI", gender: "male", team: "rentap", gold: 1, silver: 0, bronze: 0, points: 5 },
+            { name: "MOHAMMAD ALFAH BIN ABDULLAH", gender: "male", team: "aki", gold: 0, silver: 2, bronze: 0, points: 6 },
+            { name: "ANGIE CRYSTAL JIMMY", gender: "female", team: "hang-tuah", gold: 0, silver: 2, bronze: 0, points: 6 },
+            { name: "NUR QISYATUL QHAYRRA ZANIA BINTI ZAKARIA", gender: "female", team: "aki", gold: 0, silver: 1, bronze: 0, points: 3 },
+            { name: "SAIFUL AZAM BIN ABDULLAH", gender: "male", team: "mat-salleh", gold: 0, silver: 0, bronze: 2, points: 2 },
+            { name: "NUR IZZQUEISHA AIN BINTI JAFNAR", gender: "female", team: "aki", gold: 0, silver: 0, bronze: 2, points: 2 }
         ];
 
         // Initialize when DOM is loaded
@@ -1429,8 +1434,17 @@
             const tableBody = document.getElementById('top-scorers-table');
             tableBody.innerHTML = '';
             
-            // Sort by points (descending)
-            const sortedScorers = [...topScorers].sort((a, b) => b.points - a.points);
+            // Sort by points (descending), then gold, then silver, then bronze
+            const sortedScorers = [...topScorers].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.gold !== a.gold) return b.gold - a.gold;
+                if (b.silver !== a.silver) return b.silver - a.silver;
+                return b.bronze - a.bronze;
+            });
+            
+            // Highlight Olahragawan dan Olahragawati
+            const olahragawan = sortedScorers.find(s => s.gender === 'male' && s.points === Math.max(...sortedScorers.filter(s => s.gender === 'male').map(s => s.points)));
+            const olahragawati = sortedScorers.find(s => s.gender === 'female' && s.points === Math.max(...sortedScorers.filter(s => s.gender === 'female').map(s => s.points)));
             
             sortedScorers.forEach((scorer, index) => {
                 const row = document.createElement('tr');
@@ -1455,9 +1469,20 @@
                 const silverIcon = scorer.silver > 0 ? `<i class="bi bi-award-fill silver"></i> ${scorer.silver}` : '0';
                 const bronzeIcon = scorer.bronze > 0 ? `<i class="bi bi-award-fill bronze"></i> ${scorer.bronze}` : '0';
                 
+                // Highlight row for champions
+                let rowClass = '';
+                if ((scorer.gender === 'male' && scorer.name === olahragawan.name) || 
+                    (scorer.gender === 'female' && scorer.name === olahragawati.name)) {
+                    rowClass = 'table-warning';
+                }
+                
+                row.className = rowClass;
                 row.innerHTML = `
                     <td class="fw-bold">${index + 1}</td>
-                    <td class="fw-bold">${scorer.name}</td>
+                    <td class="fw-bold">${scorer.name} 
+                        ${scorer.name === olahragawan.name ? '<span class="badge bg-warning text-dark ms-2">Olahragawan</span>' : ''}
+                        ${scorer.name === olahragawati.name ? '<span class="badge bg-warning text-dark ms-2">Olahragawati</span>' : ''}
+                    </td>
                     <td>${scorer.gender === 'male' ? 'Lelaki' : 'Perempuan'}</td>
                     <td><span class="team-badge ${teamClass[scorer.team]}">${teamNames[scorer.team]}</span></td>
                     <td>${goldIcon}</td>
